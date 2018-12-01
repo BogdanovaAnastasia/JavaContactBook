@@ -2,6 +2,9 @@ package org.itstep.msk;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -12,22 +15,8 @@ import java.util.stream.StreamSupport;
  * @version 1.0
  */
 public final class App {
-    /**
-     * To print out contacts
-     * Defines the main abstractions needed to do the job
-     *
-     * @param contactFormatters Iterable with contacts
-     * @param writeTo PrintWriter to write to
-     * */
-    private static void printContacts(Iterable<ContactFormatter> contactFormatters, PrintWriter writeTo) {
-        for (ContactFormatter cf : contactFormatters) {
-            cf.print(writeTo);
-            writeTo.println();
-        }
-        writeTo.flush();
-    }
-
     public static void main( String[] args ) {
+//================================== Testing data ===================================
         ArrayList<Contact> contacts = new ArrayList<>(16);
         contacts.add(new Contact("Павел Иванович Чичиков","+13(900)999-99-99"));
         contacts.add(new Contact("Настасья Петровна Коробочка","+17(900) 999 99 99"));
@@ -42,16 +31,26 @@ public final class App {
         contacts.add(new Contact("Mary Debenham","+19 900 999 99 99"));
         contacts.add(new Contact("Mrs. Hubbard","+23 900 999-99-99"));
 
-//=======================================================================================
-        SimpleContactBook contactBook = new ArrayContactBook(contacts);
-//=======================================================================================
+//============================ Application Bootstrap ================================
+        SpecificationContactBook contactBook = new ArraySpecificationContactBook(new ArrayContactBook(contacts)); //data source
+        PrintWriter printer = new PrintWriter(System.out); //output stream
+        Scanner sc = new Scanner(System.in); //user input supplier
 
-        printContacts(
-                StreamSupport.stream(contactBook.read().spliterator(),true)
-                        .map(x->new StringContactFormatter(x,18,20))
-                        .collect(Collectors.toList())
-                ,new PrintWriter(System.out)
-        );
+        Map<String,Command> commands = new HashMap<>();
+        Command onFailure = new OnWrongCommand("Неизвестная команда, повторите ввод"+System.lineSeparator(),printer);
+        CommandApplication mainApp = new CommandApplication(commands,onFailure,()->sc.next());
 
+        //populate commands
+        commands.put("exit",new ExitCommand(mainApp));
+        commands.put("list",new PrintContactsCommand(printer,contactBook));
+        commands.put("find",new FindByNameCommand(new ArrayBackedFindByNameFactory(),contactBook,()->sc.next(),printer));
+
+//====================================================================================
+        try {
+            mainApp.start();
+        } catch (Throwable t) {
+            System.out.println("Что-то пошло не так...");
+            System.out.println(t.getMessage());
+        }
     }
 }
