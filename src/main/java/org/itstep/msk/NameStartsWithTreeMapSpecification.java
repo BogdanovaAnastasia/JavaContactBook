@@ -4,6 +4,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Specification to find prefix wich any word of the Contact starts from
+ *
+ * @author BogdanovaAnastasia
+ * @version 1.0
+ * */
 public class NameStartsWithTreeMapSpecification implements TreeMapSpecification {
     private final String prefix;
 
@@ -15,7 +21,6 @@ public class NameStartsWithTreeMapSpecification implements TreeMapSpecification 
     public Iterable<Contact> read(Map<String, NameComparableContact> map) {
         Set<String> keys = map.keySet();
         Set<NameComparableContact> setToRead = new HashSet<>();
-
         setToRead.clear();
 
         for (String key : keys) {
@@ -23,19 +28,17 @@ public class NameStartsWithTreeMapSpecification implements TreeMapSpecification 
             keyStringMore.addAll(Arrays.asList(key.split(" ")));
 
             if (keyStringMore.size() > 1) {
-
                 for (String mapKey : keyStringMore) {
                     if (mapKey.startsWith(prefix)) {
                         setToRead.add(map.get(key));
                         break;
                     }
                 }
-
-                } else{
-                    if (key.startsWith(prefix))
-                        map.remove(map.get(key));
-                }
+            } else {
+                if (key.startsWith(prefix))
+                    map.remove(map.get(key));
             }
+        }
         return setToRead.size() == 0 ? Collections.emptyList() : setToRead.stream().map(NameComparableContact::extract).collect(Collectors.toList());
     }
 
@@ -47,7 +50,6 @@ public class NameStartsWithTreeMapSpecification implements TreeMapSpecification 
             List<String> keyStringMore = new ArrayList<>();
             keyStringMore.addAll(Arrays.asList(key.split(" ")));
             if (keyStringMore.size() > 1) {
-                Map<String, Contact> mapKeyStringMore = new TreeMap<>();
                 for (String mapKey : keyStringMore) {
                     if (mapKey.startsWith(prefix)) {
                         map.remove(map.get(key));

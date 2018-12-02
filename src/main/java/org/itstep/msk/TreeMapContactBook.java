@@ -4,6 +4,12 @@ import java.util.Collections;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+/**
+ * In memory repository baked by a TreeMap
+ *
+ * @author BogdanovaAnastasia
+ * @version 1.0
+ * */
 public class TreeMapContactBook implements SpecificationContactBook {
     private final TreeMap<String, NameComparableContact> nameKey;
 

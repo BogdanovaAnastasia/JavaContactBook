@@ -4,6 +4,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Specification to find name exactly matching any word of the Contact name
+ *
+ * @author BogdanovaAnastasia
+ * @version 1.0
+ * */
+
 public class FindByNameTreeMapSpecification implements TreeMapSpecification {
     private final String name;
 
