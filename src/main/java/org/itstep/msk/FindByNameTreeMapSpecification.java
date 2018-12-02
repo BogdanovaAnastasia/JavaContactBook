@@ -1,0 +1,60 @@
+package org.itstep.msk;
+
+import java.util.*;
+import java.util.stream.Stream;
+
+public class FindByNameTreeMapSpecification implements TreeMapSpecification {
+    private final String name;
+
+    public FindByNameTreeMapSpecification(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public Iterable<Contact> read(Map<String, Contact> map) {
+        Set<String> keys = map.keySet();
+        Set<Contact> setToRead = new TreeSet<>();
+        setToRead.clear();
+        boolean containsKey = false;
+        for (String key : keys) {
+            List<String> keyStringMore = new ArrayList<>();
+            keyStringMore.addAll(Arrays.asList(key.split(" ")));
+            if (keyStringMore.size() > 1) {
+                Map<String, Contact> mapKeyStringMore = new TreeMap<>();
+                for (String mapKey : keyStringMore) {
+                    mapKeyStringMore.put(mapKey, map.get(key));
+                }
+                containsKey = mapKeyStringMore.containsKey(name);
+            } else {
+                containsKey = map.containsKey(name);
+            }
+            if (containsKey) setToRead.add(map.get(key));
+        }
+        return setToRead.size() == 0 ? Collections.emptyList() : setToRead;
+    }
+
+    @Override
+    public void delete(Map<String, Contact> map) {
+        Set<String> keys = map.keySet();
+        boolean containsKey = false;
+        for (String key : keys) {
+            List<String> keyStringMore = new ArrayList<>();
+            keyStringMore.addAll(Arrays.asList(key.split(" ")));
+            if (keyStringMore.size() > 1) {
+                Map<String, Contact> mapKeyStringMore = new TreeMap<>();
+                for (String mapKey : keyStringMore) {
+                    mapKeyStringMore.put(mapKey, map.get(key));
+                }
+                containsKey = mapKeyStringMore.containsKey(name);
+            } else {
+                containsKey = map.containsKey(name);
+            }
+            if (containsKey) map.remove(map.get(key));
+        }
+    }
+
+    @Override
+    public boolean isSatisfying(Contact c) {
+        return Stream.of(c.getName().split(" ")).anyMatch(name::equals);
+    }
+}
