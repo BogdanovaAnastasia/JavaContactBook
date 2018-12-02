@@ -1,16 +1,21 @@
 package org.itstep.msk;
 
+import java.util.Collections;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 public class TreeMapContactBook implements SpecificationContactBook {
-    private final TreeMap<String, Contact> nameKey;
+    private final TreeMap<String, NameComparableContact> nameKey;
 
-    public TreeMapContactBook(TreeMap<String, Contact> nameKey) {
+    public TreeMapContactBook(TreeMap<String, NameComparableContact> nameKey) {
         this.nameKey = nameKey;
     }
 
     @Override
     public Iterable<Contact> read(ContactSpecification spec) {
+        if(((TreeMapSpecification) spec).read(nameKey).equals(Collections.emptyList())){
+            System.out.println("Совпадений не найдено");
+        }
         return ((TreeMapSpecification) spec).read(nameKey);
     }
 
@@ -23,7 +28,7 @@ public class TreeMapContactBook implements SpecificationContactBook {
     @Override
     public Contact create(String name, String phoneNumber) {
         Contact res = new Contact(name, phoneNumber);
-        nameKey.put(res.getName(), res);
+        nameKey.put(res.getName(), new NameComparableContact(res));
         return res;
     }
 
@@ -35,7 +40,7 @@ public class TreeMapContactBook implements SpecificationContactBook {
 
     @Override
     public Iterable<Contact> read() {
-        return nameKey.values();
+        return nameKey.values().stream().map(NameComparableContact::extract).collect(Collectors.toList());
     }
 
     @Override

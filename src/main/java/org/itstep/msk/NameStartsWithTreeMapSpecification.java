@@ -4,58 +4,65 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class FindByNameTreeMapSpecification implements TreeMapSpecification {
-    private final String name;
+public class NameStartsWithTreeMapSpecification implements TreeMapSpecification {
+    private final String prefix;
 
-    public FindByNameTreeMapSpecification(String name) {
-        this.name = name;
+    public NameStartsWithTreeMapSpecification(String prefix) {
+        this.prefix = prefix;
     }
 
     @Override
     public Iterable<Contact> read(Map<String, NameComparableContact> map) {
         Set<String> keys = map.keySet();
         Set<NameComparableContact> setToRead = new HashSet<>();
+
         setToRead.clear();
-        boolean containsKey = false;
+
         for (String key : keys) {
             List<String> keyStringMore = new ArrayList<>();
             keyStringMore.addAll(Arrays.asList(key.split(" ")));
+
             if (keyStringMore.size() > 1) {
-                Map<String, Contact> mapKeyStringMore = new TreeMap<>();
+
                 for (String mapKey : keyStringMore) {
-                    mapKeyStringMore.put(mapKey, map.get(key).extract());
+                    if (mapKey.startsWith(prefix)) {
+                        setToRead.add(map.get(key));
+                        break;
+                    }
                 }
-                containsKey = mapKeyStringMore.containsKey(name);
-            } else {
-                containsKey = map.containsKey(name);
+
+                } else{
+                    if (key.startsWith(prefix))
+                        map.remove(map.get(key));
+                }
             }
-            if (containsKey) setToRead.add(map.get(key));
-        }
         return setToRead.size() == 0 ? Collections.emptyList() : setToRead.stream().map(NameComparableContact::extract).collect(Collectors.toList());
     }
 
     @Override
     public void delete(Map<String, NameComparableContact> map) {
         Set<String> keys = map.keySet();
-        boolean containsKey = false;
+
         for (String key : keys) {
             List<String> keyStringMore = new ArrayList<>();
             keyStringMore.addAll(Arrays.asList(key.split(" ")));
             if (keyStringMore.size() > 1) {
                 Map<String, Contact> mapKeyStringMore = new TreeMap<>();
                 for (String mapKey : keyStringMore) {
-                    mapKeyStringMore.put(mapKey, map.get(key).extract());
+                    if (mapKey.startsWith(prefix)) {
+                        map.remove(map.get(key));
+                        break;
+                    }
                 }
-                containsKey = mapKeyStringMore.containsKey(name);
             } else {
-                containsKey = map.containsKey(name);
+                if (key.startsWith(prefix))
+                    map.remove(map.get(key));
             }
-            if (containsKey) map.remove(map.get(key));
         }
     }
 
     @Override
     public boolean isSatisfying(Contact c) {
-        return Stream.of(c.getName().split(" ")).anyMatch(name::equals);
+        return Stream.of(c.getName().split(" ")).anyMatch(prefix::startsWith);
     }
 }

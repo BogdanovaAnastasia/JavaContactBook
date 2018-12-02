@@ -1,10 +1,7 @@
 package org.itstep.msk;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -36,6 +33,10 @@ public final class App {
         PrintWriter printer = new PrintWriter(System.out); //output stream
         Scanner sc = new Scanner(System.in); //user input supplier
 
+        TreeMap<String, NameComparableContact> mapContacts = new TreeMap<>();
+        mapContacts.putAll(contacts.stream().collect(Collectors.toMap(Contact::getName,contact ->new NameComparableContact(contact))));
+        SpecificationContactBook contactBook1 = new TreeMapContactBook(mapContacts);
+
         Map<String,Command> commands = new HashMap<>();
         Command onFailure = new OnWrongCommand("Неизвестная команда, повторите ввод"+System.lineSeparator(),printer);
         CommandApplication mainApp = new CommandApplication(commands,onFailure,()->sc.next());
@@ -43,7 +44,9 @@ public final class App {
         //populate commands
         commands.put("exit",new ExitCommand(mainApp));
         commands.put("list",new PrintContactsCommand(printer,contactBook));
-        commands.put("find",new FindByNameCommand(new ArrayBackedFindByNameFactory(),contactBook,()->sc.next(),printer));
+//        commands.put("find",new FindByNameCommand(new ArrayBackedFindByNameFactory(),contactBook,()->sc.next(),printer));
+        commands.put("find",new FindByNameCommand(new TreeMapBackedFindByNameFactory(), contactBook1, () -> sc.next(), printer));
+//        commands.put("find",new FindByNameCommand(new TreeMapBackedStartsWithFactory(), contactBook1, () -> sc.next(), printer));
 
 //====================================================================================
         try {
