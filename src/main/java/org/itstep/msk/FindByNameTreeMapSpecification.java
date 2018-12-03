@@ -18,46 +18,40 @@ public class FindByNameTreeMapSpecification implements TreeMapSpecification {
         this.name = name;
     }
 
+    public void addContactToMapSet(TreeMap<String,ArrayList<Contact>> mapSet, String uniqueName, Contact contact){
+        if(!mapSet.containsKey(uniqueName)){
+            mapSet.put(uniqueName,new ArrayList<>());
+        }
+        mapSet.get(uniqueName).add(contact);
+    }
+
     @Override
     public Iterable<Contact> read(Map<String, Contact> map) {
+        TreeMap<String,ArrayList<Contact>> mapSet = new TreeMap<>();
         Set<String> keys = map.keySet();
-        Set<Contact> setToRead = new HashSet<>();
-        setToRead.clear();
-        boolean containsKey = false;
         for (String key : keys) {
-            List<String> keyStringMore = new ArrayList<>();
-            keyStringMore.addAll(Arrays.asList(key.split(" ")));
-            if (keyStringMore.size() > 1) {
-                Map<String, Contact> mapKeyStringMore = new TreeMap<>();
-                for (String mapKey : keyStringMore) {
-                    mapKeyStringMore.put(mapKey, map.get(key));
-                }
-                containsKey = mapKeyStringMore.containsKey(name);
-            } else {
-                containsKey = map.containsKey(name);
+            String strArr[] = key.split(" ");
+            for(String str: strArr){
+                addContactToMapSet(mapSet,str,map.get(key));
             }
-            if (containsKey) setToRead.add(map.get(key));
         }
-        return setToRead.size() == 0 ? Collections.emptyList() : setToRead;
+        ArrayList<Contact> listToRead = mapSet.get(name);
+        return listToRead.size() == 0 ? Collections.emptyList() : listToRead;
     }
 
     @Override
     public void delete(Map<String, Contact> map) {
+        TreeMap<String,ArrayList<Contact>> mapSet = new TreeMap<>();
         Set<String> keys = map.keySet();
-        boolean containsKey = false;
         for (String key : keys) {
-            List<String> keyStringMore = new ArrayList<>();
-            keyStringMore.addAll(Arrays.asList(key.split(" ")));
-            if (keyStringMore.size() > 1) {
-                Map<String, Contact> mapKeyStringMore = new TreeMap<>();
-                for (String mapKey : keyStringMore) {
-                    mapKeyStringMore.put(mapKey, map.get(key));
-                }
-                containsKey = mapKeyStringMore.containsKey(name);
-            } else {
-                containsKey = map.containsKey(name);
+            String strArr[] = key.split(" ");
+            for(String str: strArr){
+                addContactToMapSet(mapSet,str,map.get(key));
             }
-            if (containsKey) map.remove(map.get(key));
+        }
+        ArrayList<Contact> listToRead = mapSet.get(name);
+        for(Contact contact:listToRead){
+            map.remove(contact.getName());
         }
     }
 
