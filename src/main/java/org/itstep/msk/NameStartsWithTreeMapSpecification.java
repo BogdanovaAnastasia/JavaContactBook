@@ -18,9 +18,9 @@ public class NameStartsWithTreeMapSpecification implements TreeMapSpecification 
     }
 
     @Override
-    public Iterable<Contact> read(Map<String, NameComparableContact> map) {
+    public Iterable<Contact> read(Map<String, Contact> map) {
         Set<String> keys = map.keySet();
-        Set<NameComparableContact> setToRead = new HashSet<>();
+        Set<Contact> setToRead = new HashSet<>();
         setToRead.clear();
 
         for (String key : keys) {
@@ -39,11 +39,11 @@ public class NameStartsWithTreeMapSpecification implements TreeMapSpecification 
                     map.remove(map.get(key));
             }
         }
-        return setToRead.size() == 0 ? Collections.emptyList() : setToRead.stream().map(NameComparableContact::extract).collect(Collectors.toList());
+        return setToRead.size() == 0 ? Collections.emptyList() : setToRead;
     }
 
     @Override
-    public void delete(Map<String, NameComparableContact> map) {
+    public void delete(Map<String, Contact> map) {
         Set<String> keys = map.keySet();
 
         for (String key : keys) {

@@ -11,9 +11,9 @@ import java.util.stream.Collectors;
  * @version 1.0
  * */
 public class TreeMapContactBook implements SpecificationContactBook {
-    private final TreeMap<String, NameComparableContact> nameKey;
+    private final TreeMap<String, Contact> nameKey;
 
-    public TreeMapContactBook(TreeMap<String, NameComparableContact> nameKey) {
+    public TreeMapContactBook(TreeMap<String, Contact> nameKey) {
         this.nameKey = nameKey;
     }
 
@@ -34,7 +34,7 @@ public class TreeMapContactBook implements SpecificationContactBook {
     @Override
     public Contact create(String name, String phoneNumber) {
         Contact res = new Contact(name, phoneNumber);
-        nameKey.put(res.getName(), new NameComparableContact(res));
+        nameKey.put(res.getName(), res);
         return res;
     }
 
@@ -46,7 +46,7 @@ public class TreeMapContactBook implements SpecificationContactBook {
 
     @Override
     public Iterable<Contact> read() {
-        return nameKey.values().stream().map(NameComparableContact::extract).collect(Collectors.toList());
+        return nameKey.values();
     }
 
     @Override

@@ -19,9 +19,9 @@ public class FindByNameTreeMapSpecification implements TreeMapSpecification {
     }
 
     @Override
-    public Iterable<Contact> read(Map<String, NameComparableContact> map) {
+    public Iterable<Contact> read(Map<String, Contact> map) {
         Set<String> keys = map.keySet();
-        Set<NameComparableContact> setToRead = new HashSet<>();
+        Set<Contact> setToRead = new HashSet<>();
         setToRead.clear();
         boolean containsKey = false;
         for (String key : keys) {
@@ -30,7 +30,7 @@ public class FindByNameTreeMapSpecification implements TreeMapSpecification {
             if (keyStringMore.size() > 1) {
                 Map<String, Contact> mapKeyStringMore = new TreeMap<>();
                 for (String mapKey : keyStringMore) {
-                    mapKeyStringMore.put(mapKey, map.get(key).extract());
+                    mapKeyStringMore.put(mapKey, map.get(key));
                 }
                 containsKey = mapKeyStringMore.containsKey(name);
             } else {
@@ -38,11 +38,11 @@ public class FindByNameTreeMapSpecification implements TreeMapSpecification {
             }
             if (containsKey) setToRead.add(map.get(key));
         }
-        return setToRead.size() == 0 ? Collections.emptyList() : setToRead.stream().map(NameComparableContact::extract).collect(Collectors.toList());
+        return setToRead.size() == 0 ? Collections.emptyList() : setToRead;
     }
 
     @Override
-    public void delete(Map<String, NameComparableContact> map) {
+    public void delete(Map<String, Contact> map) {
         Set<String> keys = map.keySet();
         boolean containsKey = false;
         for (String key : keys) {
@@ -51,7 +51,7 @@ public class FindByNameTreeMapSpecification implements TreeMapSpecification {
             if (keyStringMore.size() > 1) {
                 Map<String, Contact> mapKeyStringMore = new TreeMap<>();
                 for (String mapKey : keyStringMore) {
-                    mapKeyStringMore.put(mapKey, map.get(key).extract());
+                    mapKeyStringMore.put(mapKey, map.get(key));
                 }
                 containsKey = mapKeyStringMore.containsKey(name);
             } else {
