@@ -17,59 +17,37 @@ public class NameStartsWithTreeMapSpecification implements TreeMapSpecification 
         this.prefix = prefix;
     }
 
-    public void addContactToMapSet(TreeMap<String,ArrayList<Contact>> mapSet, String uniqueName, Contact contact){
-        if(!mapSet.containsKey(uniqueName)){
-            mapSet.put(uniqueName,new ArrayList<>());
+    public void addContactToMapSet(TreeMap<String, ArrayList<Contact>> mapSet, String uniqueName, Contact contact) {
+        if (!mapSet.containsKey(uniqueName)) {
+            mapSet.put(uniqueName, new ArrayList<>());
         }
         mapSet.get(uniqueName).add(contact);
     }
-    public String getHigherPrefix(String prefix){
+
+    public String getHigherPrefix(String prefix) {
         char higerPrefixCharArr[] = prefix.toCharArray();
-        higerPrefixCharArr [prefix.length()-1] = (char) (prefix.charAt(prefix.length()-1)+'\u0001');
-        String higerPrefix = new String (higerPrefixCharArr);
-        return higerPrefix;
+        higerPrefixCharArr[prefix.length() - 1] = (char) (prefix.charAt(prefix.length() - 1) + '\u0001');
+        return new String(higerPrefixCharArr);
     }
 
     @Override
     public Iterable<Contact> read(Map<String, Contact> map) {
-        TreeMap<String,ArrayList<Contact>> mapSet = new TreeMap<>();
+        TreeMap<String, ArrayList<Contact>> mapSet = new TreeMap<>();
         Set<String> keys = map.keySet();
-        for (String key : keys) {
-            String strArr[] = key.split(" ");
-            for(String str: strArr){
-                addContactToMapSet(mapSet,str,map.get(key));
-            }
-        }
-        ArrayList<Contact> listToRead = new ArrayList<>();
-             Collection<ArrayList<Contact>> lstColl = mapSet
-                     .subMap(prefix,true,(getHigherPrefix(prefix)),false).values();
-             for (ArrayList<Contact> arrLst:lstColl){
-                     listToRead.addAll(arrLst);
-             }
+        keys.forEach(key -> Arrays.stream(key.split(" ")).forEach(string -> addContactToMapSet(mapSet, string, map.get(key))));
+        Set<Contact> listToRead = new HashSet<>();
+        mapSet.subMap(prefix, true, (getHigherPrefix(prefix)), false).values().forEach(x -> listToRead.addAll(x));
         return listToRead.size() == 0 ? Collections.emptyList() : listToRead;
     }
 
     @Override
     public void delete(Map<String, Contact> map) {
-        TreeMap<String,ArrayList<Contact>> mapSet = new TreeMap<>();
+        TreeMap<String, ArrayList<Contact>> mapSet = new TreeMap<>();
         Set<String> keys = map.keySet();
-        for (String key : keys) {
-            String strArr[] = key.split(" ");
-            for(String str: strArr){
-                addContactToMapSet(mapSet,str,map.get(key));
-            }
-        }
+        keys.forEach(key -> Arrays.stream(key.split(" ")).forEach(string -> addContactToMapSet(mapSet, string, map.get(key))));
         ArrayList<Contact> listToDelete = new ArrayList<>();
-        Collection<ArrayList<Contact>> lstColl = mapSet
-                .subMap(prefix,true,(getHigherPrefix(prefix)),false).values();
-        for (ArrayList<Contact> arrLst:lstColl){
-            if(!listToDelete.contains(arrLst)){
-                listToDelete.addAll(arrLst);
-            }
-        }
-        for(Contact contact:listToDelete){
-            map.remove(contact.getName());
-        }
+        mapSet.subMap(prefix, true, (getHigherPrefix(prefix)), false).values().forEach(x -> listToDelete.addAll(x));
+        listToDelete.forEach(c -> map.remove(c.getName()));
     }
 
     @Override

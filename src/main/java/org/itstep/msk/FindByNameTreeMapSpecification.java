@@ -18,40 +18,34 @@ public class FindByNameTreeMapSpecification implements TreeMapSpecification {
         this.name = name;
     }
 
-    public void addContactToMapSet(TreeMap<String,ArrayList<Contact>> mapSet, String uniqueName, Contact contact){
-        if(!mapSet.containsKey(uniqueName)){
-            mapSet.put(uniqueName,new ArrayList<>());
+    public void addContactToMapSet(TreeMap<String, ArrayList<Contact>> mapSet, String uniqueName, Contact contact) {
+        if (!mapSet.containsKey(uniqueName)) {
+            mapSet.put(uniqueName, new ArrayList<>());
         }
         mapSet.get(uniqueName).add(contact);
     }
 
     @Override
     public Iterable<Contact> read(Map<String, Contact> map) {
-        TreeMap<String,ArrayList<Contact>> mapSet = new TreeMap<>();
+        TreeMap<String, ArrayList<Contact>> mapSet = new TreeMap<>();
         Set<String> keys = map.keySet();
-        for (String key : keys) {
-            String strArr[] = key.split(" ");
-            for(String str: strArr){
-                addContactToMapSet(mapSet,str,map.get(key));
-            }
+        ArrayList<Contact> listToRead = new ArrayList<>();
+        keys.forEach(key -> Arrays.stream(key.split(" ")).forEach(string -> addContactToMapSet(mapSet, string, map.get(key))));
+        if (mapSet.containsKey(name)) {
+            listToRead = mapSet.get(name);
         }
-        ArrayList<Contact> listToRead = mapSet.get(name);
         return listToRead.size() == 0 ? Collections.emptyList() : listToRead;
     }
 
     @Override
     public void delete(Map<String, Contact> map) {
-        TreeMap<String,ArrayList<Contact>> mapSet = new TreeMap<>();
+        TreeMap<String, ArrayList<Contact>> mapSet = new TreeMap<>();
         Set<String> keys = map.keySet();
-        for (String key : keys) {
-            String strArr[] = key.split(" ");
-            for(String str: strArr){
-                addContactToMapSet(mapSet,str,map.get(key));
-            }
-        }
-        ArrayList<Contact> listToDelete = mapSet.get(name);
-        for(Contact contact:listToDelete){
-            map.remove(contact.getName());
+        ArrayList<Contact> listToDelete;
+        keys.forEach(key -> Arrays.stream(key.split(" ")).forEach(string -> addContactToMapSet(mapSet, string, map.get(key))));
+        if (mapSet.containsKey(name)) {
+            listToDelete = mapSet.get(name);
+            listToDelete.forEach(c->map.remove(c.getName()));
         }
     }
 
