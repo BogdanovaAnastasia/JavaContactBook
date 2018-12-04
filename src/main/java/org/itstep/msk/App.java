@@ -33,8 +33,8 @@ public final class App {
         PrintWriter printer = new PrintWriter(System.out); //output stream
         Scanner sc = new Scanner(System.in); //user input supplier
 
-        TreeMap<String, NameComparableContact> mapContacts = new TreeMap<>();
-        mapContacts.putAll(contacts.stream().collect(Collectors.toMap(Contact::getName,contact ->new NameComparableContact(contact))));
+        TreeMap<String, Contact> mapContacts = new TreeMap<>();
+        mapContacts.putAll(contacts.stream().collect(Collectors.toMap(Contact::getName,contact->contact)));
         SpecificationContactBook contactBook1 = new TreeMapContactBook(mapContacts);
 
         Map<String,Command> commands = new HashMap<>();
@@ -45,8 +45,8 @@ public final class App {
         commands.put("exit",new ExitCommand(mainApp));
         commands.put("list",new PrintContactsCommand(printer,contactBook));
 //        commands.put("find",new FindByNameCommand(new ArrayBackedFindByNameFactory(),contactBook,()->sc.next(),printer));
-        commands.put("find",new FindByNameCommand(new TreeMapBackedFindByNameFactory(), contactBook1, () -> sc.next(), printer));
-//        commands.put("find",new FindByNameCommand(new TreeMapBackedStartsWithFactory(), contactBook1, () -> sc.next(), printer));
+//        commands.put("find",new FindByNameCommand(new TreeMapBackedFindByNameFactory(), contactBook1, () -> sc.next(), printer));
+        commands.put("find",new FindByNameCommand(new TreeMapBackedStartsWithFactory(), contactBook1, () -> sc.next(), printer));
 
 //====================================================================================
         try {
