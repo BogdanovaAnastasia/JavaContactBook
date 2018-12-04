@@ -49,8 +49,8 @@ public class FindByNameTreeMapSpecification implements TreeMapSpecification {
                 addContactToMapSet(mapSet,str,map.get(key));
             }
         }
-        ArrayList<Contact> listToRead = mapSet.get(name);
-        for(Contact contact:listToRead){
+        ArrayList<Contact> listToDelete = mapSet.get(name);
+        for(Contact contact:listToDelete){
             map.remove(contact.getName());
         }
     }
